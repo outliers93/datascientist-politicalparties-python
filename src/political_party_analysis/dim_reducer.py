@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.decomposition import PCA
 
 
 class DimensionalityReducer:
@@ -10,5 +11,19 @@ class DimensionalityReducer:
         self.n_components = n_components
         self.data = data
         self.feature_columns = data.columns
+        self.model = PCA(n_components=n_components)
+        self._data_reduced = None
 
-    ##### YOUR CODE GOES HERE #####
+    def _process_data(self) -> pd.DataFrame:
+        data = pd.DataFrame(
+            self.model.fit_transform(self.data),
+            columns=[f"C_{i+1}" for i in range(self.n_components)],
+            index=self.data.index,
+        )
+        return data
+
+    @property
+    def data_reduced(self) -> pd.DataFrame:
+        if self._data_reduced is None:
+            self._data_reduced = self._process_data()
+        return self._data_reduced
