@@ -19,14 +19,18 @@ def mock_df() -> pd.DataFrame:
     return df
 
 
-def test_download_data():
+def test_download_data(mocker):
     data_loader = DataLoader()
     assert data_loader.party_data.shape == (277, 55)
 
 
 def test_preprocess_data(mocker, mock_df: pd.DataFrame):
+    mocker.patch(
+        "political_party_analysis.loader.DataLoader._download_data",
+        return_value=mock_df,
+    )
+    # Mock DataLoader._download_data first to do not attempt to pull real data
     data_loader = DataLoader()
-    mocker.patch.object(data_loader, "party_data", mock_df)
     mocker.patch.object(data_loader, "non_features", ["non_feature"])
     mocker.patch.object(data_loader, "index", "id")
     data_loader.preprocess_data()
